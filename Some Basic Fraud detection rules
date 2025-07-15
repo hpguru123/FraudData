@@ -1,0 +1,28 @@
+Rule	Condition	Suspicion Type
+High-Value International Transfers	TransactionCode in ['SEPA', 'MT103'] and Amount > £10,000	Money Laundering
+Structured Deposits	TransactionCode in ['CSH', 'BGC'] and 900 < Amount < 1000	Structuring
+Rapid Successive Transfers	Multiple FPO or TFR from same source within 1 hour	Layering or Smurfing
+Unusual Refund Activity	REF > £1000 with no matching DEB/POS	Fake Refund Fraud
+High ATM Activity	More than 5 ATM transactions in 1 day	Card Cloning
+Cheque Value Outliers	TransactionCode == 'CHQ' and Amount > £10,000	Cheque Fraud
+New Beneficiary + High Amount	FPO > £5,000 to new beneficiary	APP Fraud
+
+
+Advanced
+
+Rule Name	Detection Logic	Risk Type
+1. Velocity of High-Value Payments	If a customer makes >3 payments >£10,000 in under 24 hours, flag.	Money Laundering / Layering
+2. Payment to High-Risk Jurisdiction	If destination IBAN/SWIFT is in high-risk country (e.g., Cayman, UAE, Panama), and amount >£5,000.	Cross-Border Laundering
+3. Beneficiary Account Chaining	If funds flow from A→B→C→D (via FPO/TFR) within 48 hours and B/C are shell companies.	Layering / Round-Tripping
+4. Sudden Profile Change	If dormant account becomes active and spends >£20,000 in 3 days.	Account Takeover or Mule Activity
+5. Unusual Merchant Category	If corporate account pays a high-risk merchant type (e.g. adult, crypto, betting) but is registered as a charity.	False Merchant Classification
+6. Cheque-Wash Pattern	A high-value CHQ is issued and reversed within 48 hours, followed by an FPO to a new beneficiary.	Cheque Fraud / APP Fraud
+7. Duplicate Refunds	If >2 REF payments from same merchant to same account with exact amounts in <12h.	Refund Fraud
+8. ATM Location Inconsistency	ATM withdrawals in different UK cities within <1 hour.	ATM Card Cloning
+9. SMURF Detection (Structured Transfers)	10+ incoming CSH/BGC deposits from multiple sources, all £980–999, in <48h.	Structuring
+10. First-Time Beneficiary Spike	New payee added + payment >£7,000 within 2h.	APP Fraud
+11. Shell Company Payments	Entity sends funds to multiple offshore recipients within 24h but has <£5k revenue history.	Trade-Based Laundering
+12. Credit-Then-Immediate-Debit	Account receives large BAC/INT, and 90%+ is withdrawn within 6h.	Bust-Out / Mule Accounts
+13. Account Reconciliation Conflict	Total REF > total POS/DEB over 30d for individual account.	Suspicious Refund Activity
+14. Multi-Account Crossflows	One source account sends funds to 4+ accounts within 2h, and they all return it within 24h.	Circular Trading / Round-Tripping
+15. Transaction Time Anomalies	Transactions posted at 02:00–04:00 AM repeatedly (non-standard hours) from business account.	Insider or Compromised Account
